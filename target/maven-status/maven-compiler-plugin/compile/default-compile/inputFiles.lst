@@ -2,6 +2,7 @@ C:\Users\halke\Desktop\Dispochat\src\main\java\au\dispochat\room\service\RoomSer
 C:\Users\halke\Desktop\Dispochat\src\main\java\au\dispochat\chatter\controller\ChatterController.java
 C:\Users\halke\Desktop\Dispochat\src\main\java\au\dispochat\chatter\repository\ChatterRepository.java
 C:\Users\halke\Desktop\Dispochat\src\main\java\au\dispochat\room\entity\Room.java
+C:\Users\halke\Desktop\Dispochat\src\main\java\au\dispochat\room\controller\dto\JoinRoomDTO.java
 C:\Users\halke\Desktop\Dispochat\src\main\java\au\dispochat\chatter\controller\mapper\ChatterMapper.java
 C:\Users\halke\Desktop\Dispochat\src\main\java\au\dispochat\DispochatApplication.java
 C:\Users\halke\Desktop\Dispochat\src\main\java\au\dispochat\room\repository\RoomRepository.java

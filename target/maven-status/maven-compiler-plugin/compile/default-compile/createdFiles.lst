@@ -1,11 +1,12 @@
-au\dispochat\room\service\RoomService.class
 au\dispochat\chatter\controller\mapper\ChatterMapper.class
 au\dispochat\chatter\entity\Chatter.class
 au\dispochat\room\controller\RoomController.class
 au\dispochat\chatter\service\ChatterService.class
+au\dispochat\chatter\repository\ChatterRepository.class
+au\dispochat\chatter\controller\dto\ChatterDTO.class
+au\dispochat\room\service\RoomService.class
+au\dispochat\room\controller\dto\JoinRoomDTO.class
 au\dispochat\chatter\controller\ChatterController.class
 au\dispochat\room\repository\RoomRepository.class
 au\dispochat\DispochatApplication.class
 au\dispochat\room\entity\Room.class
-au\dispochat\chatter\repository\ChatterRepository.class
-au\dispochat\chatter\controller\dto\ChatterDTO.class
