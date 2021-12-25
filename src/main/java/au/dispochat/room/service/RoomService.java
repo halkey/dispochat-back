@@ -6,6 +6,8 @@ import au.dispochat.room.entity.Room;
 import au.dispochat.room.repository.RoomRepository;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
+
 
 @Service
 public class RoomService {
@@ -18,10 +20,11 @@ public class RoomService {
         this.roomRepository = roomRepository;
     }
 
-    public String createRoom(String uniqueKey) {
+    public Long createRoom(String uniqueKey) {
         Chatter chatter = chatterRepository
                 .findByUniqueKey(uniqueKey);
-        System.out.println("Service nickname " + chatter.getNickName());
+
+        //To Do: Mapper Yapılacak
 
         Room room = new Room();
         room.setOwner(chatter.getNickName());
@@ -33,8 +36,17 @@ public class RoomService {
 
         roomRepository.save(room);
 
-        return "Room has been created";
+        return room.getId();
 
+    }
+
+    @Transactional
+    public Room joinRoom(Long roomId, Chatter guestChatter) {
+        Room targetRoom = roomRepository.findById(roomId);
+        targetRoom.setGuest(guestChatter.getNickName());
+        targetRoom.setGuestUniqueKey(guestChatter.getUniqueKey());
+        roomRepository.guncelleRoom(targetRoom);
+        return targetRoom;
     }
 
 }

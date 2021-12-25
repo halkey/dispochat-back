@@ -15,11 +15,15 @@ public class ChatterService {
 
     public String createChatter(Chatter chatter) {
 
-        if(chatterRepository.existsByUniqueKey(chatter.getUniqueKey())) {
+        if (chatterRepository.existsByUniqueKey(chatter.getUniqueKey())) {
             return "Already Registered";
-        };
+        }
 
         chatterRepository.save(chatter);
         return "Registered Successfully";
+    }
+
+    public Chatter findByUniqueKey(String uniqueKey) {
+        return chatterRepository.findByUniqueKey(uniqueKey);
     }
 }
