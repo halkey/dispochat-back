@@ -15,9 +15,8 @@ public interface RoomRepository extends JpaRepository<Room, String> {
     @Query(
             value = """
                     update Room newRoom
-                    set newRoom.guest = :#{#room.guest} ,
-                        newRoom.guestUniqueKey = :#{#room.guestUniqueKey}
-                        where newRoom.id = :#{#room.id}
+                    set newRoom.guest = :#{#room.guest}
+                    where newRoom.id = :#{#room.id}
                     """
     )
     void guncelleRoom(

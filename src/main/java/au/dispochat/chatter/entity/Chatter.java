@@ -18,5 +18,4 @@ public class Chatter {
     private String nickName;
     private String city;
     private String country;
-
 }

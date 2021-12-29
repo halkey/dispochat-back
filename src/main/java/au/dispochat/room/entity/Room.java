@@ -16,18 +16,12 @@ public class Room {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    private String owner;
+    @ManyToOne
+    @JoinColumn(name = "OWNER_UNIQUE_KEY")
+    private Chatter owner;
 
-    private String ownerUniqueKey;
-
-    private String guest;
-
-    private String guestUniqueKey;
-
-    @Column(name = "OWNER_MESSAGE")
-    private String ownerMessage;
-
-    @Column(name = "GUEST_MESSAGE")
-    private String guestMessage;
+    @ManyToOne
+    @JoinColumn(name = "GUEST_UNIQUE_KEY")
+    private Chatter guest;
 
 }

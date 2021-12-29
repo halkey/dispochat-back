@@ -27,13 +27,8 @@ public class RoomService {
         //To Do: Mapper Yapılacak
 
         Room room = new Room();
-        room.setOwner(chatter.getNickName());
-        room.setOwnerUniqueKey(chatter.getUniqueKey());
+        room.setOwner(chatter);
         room.setGuest(null);
-        room.setGuestUniqueKey(null);
-        room.setOwnerMessage("Chat did not start!");
-        room.setGuestMessage("Chat did not start!");
-
         roomRepository.save(room);
 
         return room.getId();
@@ -43,8 +38,7 @@ public class RoomService {
     @Transactional
     public Room joinRoom(Long roomId, Chatter guestChatter) {
         Room targetRoom = roomRepository.findById(roomId);
-        targetRoom.setGuest(guestChatter.getNickName());
-        targetRoom.setGuestUniqueKey(guestChatter.getUniqueKey());
+        targetRoom.setGuest(guestChatter);
         roomRepository.guncelleRoom(targetRoom);
         return targetRoom;
     }
