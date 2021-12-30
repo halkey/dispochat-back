@@ -1,7 +1,9 @@
 package au.dispochat.chatter.controller;
 
+import au.dispochat.chatter.controller.dto.ChatterDTO;
 import au.dispochat.chatter.entity.Chatter;
 import au.dispochat.chatter.service.ChatterService;
+import au.dispochat.common.dto.MessageResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,7 +18,13 @@ public class ChatterController {
     private final ChatterService chatterService;
 
     @PostMapping
-    public String createChatter(@RequestBody Chatter chatter) {
+    public MessageResponse createChatter(@RequestBody ChatterDTO chatterDTO) {
+
+        Chatter chatter = new Chatter();
+        chatter.setUniqueKey(chatterDTO.getUniqueKey());
+        chatter.setNickName(chatterDTO.getNickName());
+        chatter.setCity(chatterDTO.getCity());
+        chatter.setCountry(chatterDTO.getCountry());
 
         return chatterService.createChatter(chatter);
 
