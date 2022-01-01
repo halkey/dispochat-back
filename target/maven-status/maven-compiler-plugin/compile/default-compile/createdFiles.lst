@@ -1,3 +1,4 @@
+au\dispochat\cors\controller\OptionsController$SimpleCorsFilter.class
 au\dispochat\chatter\controller\mapper\ChatterMapper.class
 au\dispochat\common\dto\MessageResponse.class
 au\dispochat\chatter\entity\Chatter.class
