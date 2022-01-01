@@ -11,7 +11,7 @@ import java.util.Date;
 public class WebsocketController {
     @MessageMapping("/chat")
     @SendTo("/topic/messages")
-    public OutputMessage send(Message message) throws Exception {
+    public OutputMessage send(Message message) {
         String time = new SimpleDateFormat("HH:mm").format(new Date());
         System.out.println("controller");
         return new OutputMessage(message.getFrom(), message.getText(), time);

@@ -17,11 +17,15 @@ public class Room {
     private long id;
 
     @ManyToOne
-    @JoinColumn(name = "OWNER_UNIQUE_KEY")
+    @JoinColumn(name = "OWNER")
     private Chatter owner;
 
     @ManyToOne
-    @JoinColumn(name = "GUEST_UNIQUE_KEY")
+    @JoinColumn(name = "GUEST")
     private Chatter guest;
+
+    @ManyToOne
+    @JoinColumn(name = "WANT_TO_JOIN")
+    private Chatter wantToJoin;
 
 }

@@ -35,9 +35,10 @@ public class RoomService {
         Room room = new Room();
         room.setOwner(chatter);
         room.setGuest(null);
+        room.setWantToJoin(null);
         roomRepository.save(room);
 
-        return new MessageResponse(MessageResponseType.SUCCESS, "Room With Id \"%d\" Has Been Created!".formatted(room.getId()));
+        return new MessageResponse(MessageResponseType.SUCCESS, "Room With Id %d Has Been Created!".formatted(room.getId()));
     }
 
     @Transactional
@@ -51,14 +52,17 @@ public class RoomService {
 
         Room targetRoom = new Room();
         try {
-            roomRepository.findById(roomId);
+            targetRoom = roomRepository.findById(roomId);
         } catch (Exception roomException) {
-            return new MessageResponse(MessageResponseType.ERROR, "Room With Id \"%d\" Is Not Exist!".formatted(roomId));
+            return new MessageResponse(MessageResponseType.ERROR, "Room With Id %d Is Not Exist!".formatted(roomId));
         }
 
-        targetRoom.setGuest(guestChatter);
+        if (targetRoom.getWantToJoin() != null) {
+            return new MessageResponse(MessageResponseType.ERROR, "You Are Too Late! Someone Else Sent a Join Request to Room With Id %d Before You.".formatted(roomId));
+        }
+        targetRoom.setWantToJoin(guestChatter);
         roomRepository.guncelleRoom(targetRoom);
-        return new MessageResponse(MessageResponseType.SUCCESS, "Your Join Request To Room \"%d\" Has Been Sent to Owner of the Room".formatted(roomId));
+        return new MessageResponse(MessageResponseType.SUCCESS, "Your Join Request To Room %d Has Been Sent to Owner of the Room".formatted(roomId));
     }
 
 }
