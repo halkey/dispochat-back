@@ -10,6 +10,7 @@ import au.dispochat.room.repository.RoomRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
 
 
@@ -23,12 +24,9 @@ public class RoomService {
     private final ChatterService chatterService;
 
     public MessageResponse createRoom(String uniqueKey) {
-        Chatter chatter = new Chatter();
-        try {
-            chatter = chatterRepository.findByUniqueKey(uniqueKey);
-        } catch (Exception chatterException) {
-            return new MessageResponse(MessageResponseType.ERROR, "You Did Not Register Yet!");
-        }
+
+        Chatter chatter = chatterRepository.findByUniqueKey(uniqueKey)
+                .orElseThrow(() -> new EntityNotFoundException("You Did Not Register Yet!"));
 
         //TO DO Mapper Yapılacak
 
@@ -38,31 +36,28 @@ public class RoomService {
         room.setWantToJoin(null);
         roomRepository.save(room);
 
-        return new MessageResponse(MessageResponseType.SUCCESS, "Room With Id %d Has Been Created!".formatted(room.getId()));
+        return new MessageResponse(MessageResponseType.SUCCESS, "Room with id %d has been created!".formatted(room.getId()), room.getId());
+
     }
 
     @Transactional
     public MessageResponse joinRoom(Long roomId, String uniqueKey) {
-        Chatter guestChatter = new Chatter();
-        try {
-            guestChatter = chatterService.findByUniqueKey(uniqueKey);
-        } catch (Exception chatterException) {
-            return new MessageResponse(MessageResponseType.ERROR, "You Did Not Register Yet!");
-        }
+        Chatter guestChatter = chatterService.findByUniqueKey(uniqueKey)
+                .orElseThrow(() -> new EntityNotFoundException("You did not register yet!"));
 
-        Room targetRoom = new Room();
-        try {
-            targetRoom = roomRepository.findById(roomId);
-        } catch (Exception roomException) {
-            return new MessageResponse(MessageResponseType.ERROR, "Room With Id %d Is Not Exist!".formatted(roomId));
-        }
+        Room targetRoom = roomRepository.findById(roomId)
+                .orElseThrow(() -> new EntityNotFoundException("Room with id %d is not exist!".formatted(roomId)));
 
         if (targetRoom.getWantToJoin() != null) {
-            return new MessageResponse(MessageResponseType.ERROR, "You Are Too Late! Someone Else Sent a Join Request to Room With Id %d Before You.".formatted(roomId));
+            return new MessageResponse(MessageResponseType.ERROR, "You are too late! Someone else sent a join request to the room with id %d before you.".formatted(roomId), null);
         }
+
+        if (targetRoom.getGuest() != null) {
+            return new MessageResponse(MessageResponseType.ERROR, "You are too late! Someone else has joined to the room with id %d before you and the chat has started".formatted(roomId), null);
+        }
+
         targetRoom.setWantToJoin(guestChatter);
         roomRepository.guncelleRoom(targetRoom);
-        return new MessageResponse(MessageResponseType.SUCCESS, "Your Join Request To Room %d Has Been Sent to Owner of the Room".formatted(roomId));
+        return new MessageResponse(MessageResponseType.SUCCESS, "Your join request to room %d has been sent to owner of the room".formatted(roomId), null);
     }
-
 }

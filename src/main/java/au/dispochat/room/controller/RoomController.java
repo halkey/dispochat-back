@@ -1,5 +1,6 @@
 package au.dispochat.room.controller;
 
+import au.dispochat.common.basecontroller.BaseController;
 import au.dispochat.common.dto.MessageResponse;
 import au.dispochat.room.controller.dto.JoinRoomDTO;
 import au.dispochat.room.service.RoomService;
@@ -11,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-public class RoomController {
+public class RoomController extends BaseController {
 
     private final RoomService roomService;
 
@@ -23,7 +24,7 @@ public class RoomController {
 
     @RequestMapping("/joinRoom")
     @PostMapping
-    public MessageResponse joinRoom(@RequestBody JoinRoomDTO joinRoomDTO) {
+    public MessageResponse joinRoom(@RequestBody final JoinRoomDTO joinRoomDTO) {
         return roomService.joinRoom(joinRoomDTO.getRoomId(), joinRoomDTO.getUniqueKey());
     }
 }

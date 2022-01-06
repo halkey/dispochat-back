@@ -6,10 +6,12 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface RoomRepository extends JpaRepository<Room, String> {
 
-    Room findById(Long id);
+    Optional<Room> findById(Long id);
 
     @Modifying
     @Query(
