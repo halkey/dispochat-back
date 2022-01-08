@@ -23,13 +23,14 @@ public class RoomService {
 
     private final RoomRepository roomRepository;
 
+    @Transactional
     public MessageResponse createRoom(String uniqueKey) {
 
         Chatter chatter = chatterRepository.findByUniqueKey(uniqueKey)
                 .orElseThrow(() -> new EntityNotFoundException("You Did Not Register Yet!"));
 
         //TO DO Mapper Yapılacak
-        
+
         Room room = new Room();
         room.setOwner(chatter);
         room.setGuest(null);
