@@ -19,9 +19,9 @@ import javax.transaction.Transactional;
 public class RoomService {
 
     private final ChatterRepository chatterRepository;
-    private final RoomRepository roomRepository;
-
     private final ChatterService chatterService;
+
+    private final RoomRepository roomRepository;
 
     public MessageResponse createRoom(String uniqueKey) {
 
@@ -29,12 +29,16 @@ public class RoomService {
                 .orElseThrow(() -> new EntityNotFoundException("You Did Not Register Yet!"));
 
         //TO DO Mapper Yapılacak
-
+        
         Room room = new Room();
         room.setOwner(chatter);
         room.setGuest(null);
         room.setWantToJoin(null);
         roomRepository.save(room);
+
+        chatter.setRoom(room);
+        chatter.setRoomOwnership(true);
+        chatterService.updateChatter(chatter);
 
         return new MessageResponse(MessageResponseType.SUCCESS, "Room with id %d has been created!".formatted(room.getId()), room.getId());
 
@@ -56,8 +60,10 @@ public class RoomService {
             return new MessageResponse(MessageResponseType.ERROR, "You are too late! Someone else has joined to the room with id %d before you and the chat has started".formatted(roomId), null);
         }
 
+        guestChatter.setRoom(targetRoom);
+        chatterService.updateChatter(guestChatter);
         targetRoom.setWantToJoin(guestChatter);
-        roomRepository.guncelleRoom(targetRoom);
+        roomRepository.updateRoom(targetRoom);
         return new MessageResponse(MessageResponseType.SUCCESS, "Your join request to room %d has been sent to owner of the room".formatted(roomId), null);
     }
 }

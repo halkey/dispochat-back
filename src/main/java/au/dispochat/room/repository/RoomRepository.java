@@ -21,7 +21,7 @@ public interface RoomRepository extends JpaRepository<Room, String> {
                     where newRoom.id = :#{#room.id}
                     """
     )
-    void guncelleRoom(
+    void updateRoom(
             Room room
     );
 }

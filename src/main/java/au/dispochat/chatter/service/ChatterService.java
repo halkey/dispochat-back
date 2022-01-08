@@ -25,6 +25,10 @@ public class ChatterService {
         return new MessageResponse(MessageResponseType.SUCCESS, "Successfully registered!", null);
     }
 
+    public void updateChatter(Chatter chatter) {
+        chatterRepository.updateChatter(chatter);
+    }
+
     public Optional<Chatter> findByUniqueKey(String uniqueKey) {
         return chatterRepository.findByUniqueKey(uniqueKey);
     }

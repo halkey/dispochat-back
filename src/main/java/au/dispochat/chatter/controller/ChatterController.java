@@ -26,6 +26,8 @@ public class ChatterController extends BaseController {
         chatter.setNickName(chatterDTO.getNickName());
         chatter.setCity(chatterDTO.getCity());
         chatter.setCountry(chatterDTO.getCountry());
+        chatter.setRoom(null);
+        chatter.setRoomOwnership(false);
 
         return chatterService.createChatter(chatter);
 
