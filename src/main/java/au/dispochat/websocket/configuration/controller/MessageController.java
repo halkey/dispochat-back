@@ -15,7 +15,7 @@ public class MessageController {
     private SimpMessagingTemplate simpMessagingTemplate;
     private MessageService messageService;
 
-    @MessageMapping("/chat/messages")
+    @MessageMapping("/chat/sendMessage")
     public void sendMessage(MessageModel message) {
         Chatter receiver = messageService.sendMessage(message);
 
