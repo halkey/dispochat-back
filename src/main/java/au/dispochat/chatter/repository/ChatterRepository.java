@@ -20,7 +20,8 @@ public interface ChatterRepository extends JpaRepository<Chatter, String> {
     @Query(
             value = """
                     update Chatter newChatter
-                    set newChatter.room= :#{#chatter.room}, newChatter.roomOwnership= :#{#chatter.roomOwnership}
+                    set newChatter.room= :#{#chatter.room},
+                        newChatter.roomOwnership= :#{#chatter.roomOwnership}
                     where newChatter.uniqueKey = :#{#chatter.uniqueKey}
                     """
     )

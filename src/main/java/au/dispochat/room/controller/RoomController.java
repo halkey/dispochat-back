@@ -27,5 +27,13 @@ public class RoomController extends BaseController {
     public MessageResponse joinRoom(@RequestBody final JoinRoomDTO joinRoomDTO) {
         return roomService.joinRoom(joinRoomDTO.getRoomId(), joinRoomDTO.getUniqueKey());
     }
+
+    @RequestMapping("/accept")
+    @PostMapping
+    public MessageResponse acceptGuest(@RequestBody String uniqueKey) {
+        uniqueKey = uniqueKey.split("=")[0];
+        return roomService.acceptGuest(uniqueKey);
+
+    }
 }
 

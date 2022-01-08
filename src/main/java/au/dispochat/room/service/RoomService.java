@@ -1,7 +1,6 @@
 package au.dispochat.room.service;
 
 import au.dispochat.chatter.entity.Chatter;
-import au.dispochat.chatter.repository.ChatterRepository;
 import au.dispochat.chatter.service.ChatterService;
 import au.dispochat.common.dto.MessageResponse;
 import au.dispochat.common.enums.MessageResponseType;
@@ -18,7 +17,6 @@ import javax.transaction.Transactional;
 @RequiredArgsConstructor
 public class RoomService {
 
-    private final ChatterRepository chatterRepository;
     private final ChatterService chatterService;
 
     private final RoomRepository roomRepository;
@@ -26,10 +24,10 @@ public class RoomService {
     @Transactional
     public MessageResponse createRoom(String uniqueKey) {
 
-        Chatter chatter = chatterRepository.findByUniqueKey(uniqueKey)
+        Chatter chatter = chatterService.findByUniqueKey(uniqueKey)
                 .orElseThrow(() -> new EntityNotFoundException("You Did Not Register Yet!"));
 
-        //TO DO Mapper Yapılacak
+        //TODO Mapper Yapılacak
 
         Room room = new Room();
         room.setOwner(chatter);
@@ -41,7 +39,8 @@ public class RoomService {
         chatter.setRoomOwnership(true);
         chatterService.updateChatter(chatter);
 
-        return new MessageResponse(MessageResponseType.SUCCESS, "Room with id %d has been created!".formatted(room.getId()), room.getId());
+        return new MessageResponse(MessageResponseType.SUCCESS
+                , "Room with id %d has been created!".formatted(room.getId()), room.getId());
 
     }
 
@@ -54,17 +53,51 @@ public class RoomService {
                 .orElseThrow(() -> new EntityNotFoundException("Room with id %d is not exist!".formatted(roomId)));
 
         if (targetRoom.getWantToJoin() != null) {
-            return new MessageResponse(MessageResponseType.ERROR, "You are too late! Someone else sent a join request to the room with id %d before you.".formatted(roomId), null);
+            return new MessageResponse(MessageResponseType.ERROR
+                    , "You are too late! Someone else sent a join request to the room with id %d before you.".formatted(roomId), null);
         }
 
         if (targetRoom.getGuest() != null) {
-            return new MessageResponse(MessageResponseType.ERROR, "You are too late! Someone else has joined to the room with id %d before you and the chat has started".formatted(roomId), null);
+            return new MessageResponse(MessageResponseType.ERROR
+                    , "You are too late! Someone else has joined to the room with id %d before you and the chat has started".formatted(roomId), null);
         }
 
         guestChatter.setRoom(targetRoom);
         chatterService.updateChatter(guestChatter);
         targetRoom.setWantToJoin(guestChatter);
         roomRepository.updateRoom(targetRoom);
-        return new MessageResponse(MessageResponseType.SUCCESS, "Your join request to room %d has been sent to owner of the room".formatted(roomId), null);
+        return new MessageResponse(MessageResponseType.SUCCESS
+                , "Your join request to room %d has been sent to owner of the room".formatted(roomId), null);
+    }
+
+    @Transactional
+    public MessageResponse acceptGuest(String uniqueKey) {
+        Chatter ownerChatter = chatterService.findByUniqueKey(uniqueKey)
+                .orElseThrow(() -> new EntityNotFoundException("You did not register yet!"));
+
+        if (ownerChatter.getRoom() == null) {
+            return new MessageResponse(MessageResponseType.ERROR
+                    , "You do not have a chat room yet!", null);
+        }
+
+        Room targetRoom = ownerChatter.getRoom();
+
+        if (targetRoom.getGuest() != null) {
+            return new MessageResponse(MessageResponseType.ERROR
+                    , "You can not take more than one guest to your room!", null);
+        }
+        if (targetRoom.getWantToJoin() == null) {
+            return new MessageResponse(MessageResponseType.ERROR
+                    , "Sorry but there is no one who wants to join to your room!", null);
+        }
+
+        targetRoom.setGuest(targetRoom.getWantToJoin());
+        targetRoom.setWantToJoin(null);
+
+        //TODO notify guest!
+
+        return new MessageResponse(MessageResponseType.SUCCESS
+                , "Your accept request of user %s has been fulfilled."
+                .formatted(targetRoom.getGuest().getNickName()), null);
     }
 }
