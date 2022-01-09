@@ -24,6 +24,8 @@ public class MessageController extends BaseController {
         Chatter receiver = messageService.sendMessage(message);
 
         //TODO convertAndSendToUser
-        simpMessagingTemplate.convertAndSend("/topic/messages/" + receiver.getUniqueKey(), message);
+        if (receiver != null) {
+            simpMessagingTemplate.convertAndSend("/topic/messages/" + receiver.getUniqueKey(), message);
+        }
     }
 }
