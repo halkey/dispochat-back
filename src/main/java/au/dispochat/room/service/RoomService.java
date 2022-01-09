@@ -117,6 +117,11 @@ public class RoomService {
 
         Room targetRoom = ownerChatter.getRoom();
 
+        if (targetRoom.getGuest() == null) {
+            return new MessageResponse(MessageResponseType.ERROR
+                    , "Sorry but there is no one who wants to join to your room!", null);
+        }
+
         if (targetRoom.getRequester() == null) {
             return new MessageResponse(MessageResponseType.ERROR
                     , "Sorry but there is no one who wants to join to your room!", null);
@@ -148,5 +153,38 @@ public class RoomService {
         return new MessageResponse(MessageResponseType.SUCCESS
                 , "Your accept request of user %s has been fulfilled."
                 .formatted(targetRoom.getGuest().getNickName()), null);
+    }
+
+    public MessageResponse fetchRequester(String uniqueKey) {
+        Chatter ownerChatter = chatterService.findByUniqueKey(uniqueKey)
+                .orElseThrow(() -> new EntityNotFoundException("You did not register yet!"));
+
+        if (ownerChatter.getRoom() == null) {
+            return new MessageResponse(MessageResponseType.ERROR
+                    , "You do not have any chat room yet!", null);
+        }
+
+        if (ownerChatter.getChatterType() != ChatterType.OWNER) {
+            return new MessageResponse(MessageResponseType.ERROR
+                    , "You are not owner of any chat room", null);
+        }
+
+        Room targetRoom = ownerChatter.getRoom();
+
+        if (targetRoom.getGuest() != null) {
+            return new MessageResponse(MessageResponseType.ERROR
+                    , "You can not take more than one guest to your room!", null);
+        }
+
+        if (targetRoom.getRequester() == null) {
+            return new MessageResponse(MessageResponseType.ERROR
+                    , "Sorry but there is no one who wants to join to your room!", null);
+        }
+
+        Chatter requester = targetRoom.getRequester();
+
+        requester.setUniqueKey(null);
+        requester.setChatterType(null);
+        return new MessageResponse(MessageResponseType.SUCCESS, "%s wants to join to your room".formatted(requester.getNickName()), requester);
     }
 }
