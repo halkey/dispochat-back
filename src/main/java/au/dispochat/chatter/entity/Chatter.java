@@ -1,5 +1,6 @@
 package au.dispochat.chatter.entity;
 
+import au.dispochat.chatter.enums.ChatterType;
 import au.dispochat.room.entity.Room;
 import lombok.Getter;
 import lombok.Setter;
@@ -19,7 +20,7 @@ public class Chatter {
     @JoinColumn(name = "ROOM")
     private Room room;
 
-    private boolean roomOwnership;
+    private ChatterType chatterType;
     private String nickName;
     private String city;
     private String country;

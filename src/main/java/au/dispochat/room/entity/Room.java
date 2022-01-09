@@ -25,7 +25,7 @@ public class Room {
     private Chatter guest;
 
     @ManyToOne
-    @JoinColumn(name = "WANT_TO_JOIN")
-    private Chatter wantToJoin;
+    @JoinColumn(name = "REQUESTER")
+    private Chatter requester;
 
 }
