@@ -18,13 +18,6 @@ public class OptionsController {
     @Profile({"default", "infra-dev"})
     public class SimpleCorsFilter implements Filter {
 
-    /*
-        Swagger Password Grant Type CORS Error. Log Message:
-        Access to fetch at 'http://localhost:8080/oauth/token' from origin 'http://localhost:8085'
-        has been blocked by CORS policy: Response to preflight request doesn't pass access control check:
-        It does not have HTTP ok status.
-    */
-
         @Override
         public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
             HttpServletResponse response = (HttpServletResponse) res;
@@ -42,6 +35,5 @@ public class OptionsController {
                 chain.doFilter(req, res);
             }
         }
-
     }
 }

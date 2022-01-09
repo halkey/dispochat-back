@@ -1,14 +1,18 @@
 package au.dispochat.room.controller.dto;
 
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
+
+import javax.validation.Valid;
 
 @Data
-@NoArgsConstructor
+@RequiredArgsConstructor
 public class JoinRoomDTO {
+
 
     private String uniqueKey;
 
+    @Valid
     private Long roomId;
 
 }

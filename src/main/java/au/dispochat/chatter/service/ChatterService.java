@@ -7,6 +7,8 @@ import au.dispochat.common.enums.MessageResponseType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class ChatterService {
@@ -16,14 +18,18 @@ public class ChatterService {
     public MessageResponse createChatter(Chatter chatter) {
 
         if (chatterRepository.existsByUniqueKey(chatter.getUniqueKey())) {
-            return new MessageResponse(MessageResponseType.ERROR, "You Are Already Registered!");
+            return new MessageResponse(MessageResponseType.ERROR, "You are already registered!", null);
         }
 
         chatterRepository.save(chatter);
-        return new MessageResponse(MessageResponseType.SUCCESS, "Successfully Registered!");
+        return new MessageResponse(MessageResponseType.SUCCESS, "Successfully registered!", null);
     }
 
-    public Chatter findByUniqueKey(String uniqueKey) {
+    public void updateChatter(Chatter chatter) {
+        chatterRepository.updateChatter(chatter);
+    }
+
+    public Optional<Chatter> findByUniqueKey(String uniqueKey) {
         return chatterRepository.findByUniqueKey(uniqueKey);
     }
 }

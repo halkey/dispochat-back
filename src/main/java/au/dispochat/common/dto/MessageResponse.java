@@ -11,4 +11,5 @@ import lombok.Setter;
 public class MessageResponse {
     private final MessageResponseType messageResponseType;
     private final String Message;
+    private final Object object;
 }

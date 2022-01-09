@@ -6,20 +6,23 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface RoomRepository extends JpaRepository<Room, String> {
 
-    Room findById(Long id);
+    Optional<Room> findById(Long id);
 
     @Modifying
     @Query(
             value = """
                     update Room newRoom
-                    set newRoom.guest = :#{#room.guest}
+                    set newRoom.wantToJoin= :#{#room.wantToJoin},
+                        newRoom.guest= :#{#room.guest}
                     where newRoom.id = :#{#room.id}
                     """
     )
-    void guncelleRoom(
+    void updateRoom(
             Room room
     );
 }
