@@ -28,12 +28,12 @@ public class RoomController extends BaseController {
         return roomService.joinRoom(joinRoomDTO.getRoomId(), joinRoomDTO.getUniqueKey());
     }
 
-    @RequestMapping("/accept")
-    @PostMapping
-    public MessageResponse acceptGuest(@RequestBody String uniqueKey) {
-        uniqueKey = uniqueKey.split("=")[0];
-        return roomService.acceptGuest(uniqueKey);
+        @RequestMapping("/handleGuestRequest")
+        @PostMapping
+        public MessageResponse acceptGuest(@RequestBody String uniqueKey, Boolean isAccepted) {
+            uniqueKey = uniqueKey.split("=")[0];
+            return roomService.acceptGuest(uniqueKey, isAccepted);
 
-    }
+        }
 }
 

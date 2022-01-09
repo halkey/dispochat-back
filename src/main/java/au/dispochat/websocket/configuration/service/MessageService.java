@@ -12,7 +12,7 @@ import javax.persistence.EntityNotFoundException;
 @RequiredArgsConstructor
 public class MessageService {
 
-    private ChatterService chatterService;
+    private final ChatterService chatterService;
 
     public Chatter sendMessage(MessageModel message) {
         Chatter sender = chatterService.findByUniqueKey(message.getSenderUniqueKey())

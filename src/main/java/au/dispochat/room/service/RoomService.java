@@ -66,12 +66,15 @@ public class RoomService {
         chatterService.updateChatter(guestChatter);
         targetRoom.setWantToJoin(guestChatter);
         roomRepository.updateRoom(targetRoom);
+
+        //TODO notify owner
+
         return new MessageResponse(MessageResponseType.SUCCESS
                 , "Your join request to room %d has been sent to owner of the room".formatted(roomId), null);
     }
 
     @Transactional
-    public MessageResponse acceptGuest(String uniqueKey) {
+    public MessageResponse acceptGuest(String uniqueKey, Boolean isAccepted) {
         Chatter ownerChatter = chatterService.findByUniqueKey(uniqueKey)
                 .orElseThrow(() -> new EntityNotFoundException("You did not register yet!"));
 
@@ -82,19 +85,33 @@ public class RoomService {
 
         Room targetRoom = ownerChatter.getRoom();
 
-        if (targetRoom.getGuest() != null) {
-            return new MessageResponse(MessageResponseType.ERROR
-                    , "You can not take more than one guest to your room!", null);
-        }
         if (targetRoom.getWantToJoin() == null) {
             return new MessageResponse(MessageResponseType.ERROR
                     , "Sorry but there is no one who wants to join to your room!", null);
         }
 
+        if (!isAccepted) {
+            String guestChatterNickname = targetRoom.getWantToJoin().getNickName();
+            targetRoom.setWantToJoin(null);
+            roomRepository.updateRoom(targetRoom);
+
+            //TODO notify guest -
+
+            return new MessageResponse(MessageResponseType.SUCCESS
+                    , "Your reject request of user %s has been fulfilled."
+                    .formatted(guestChatterNickname), null);
+        }
+
+        if (targetRoom.getGuest() != null) {
+            return new MessageResponse(MessageResponseType.ERROR
+                    , "You can not take more than one guest to your room!", null);
+        }
+
         targetRoom.setGuest(targetRoom.getWantToJoin());
         targetRoom.setWantToJoin(null);
+        roomRepository.updateRoom(targetRoom);
 
-        //TODO notify guest!
+        //TODO notify guest +
 
         return new MessageResponse(MessageResponseType.SUCCESS
                 , "Your accept request of user %s has been fulfilled."
