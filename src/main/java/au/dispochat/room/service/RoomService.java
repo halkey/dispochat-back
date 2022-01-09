@@ -61,9 +61,6 @@ public class RoomService {
         Chatter guestChatter = chatterService.findByUniqueKey(uniqueKey)
                 .orElseThrow(() -> new EntityNotFoundException("You did not register yet!"));
 
-        Room targetRoom = roomRepository.findById(roomId)
-                .orElseThrow(() -> new EntityNotFoundException("Room with id %d is not exist!".formatted(roomId)));
-
         if (guestChatter.getRoom() != null) {
             if (guestChatter.getChatterType().equals(ChatterType.OWNER)) {
                 return new MessageResponse(MessageResponseType.ERROR
@@ -76,6 +73,9 @@ public class RoomService {
                         , "You have already requested to join a chat room with id %d as a guest.".formatted(guestChatter.getRoom().getId()), null);
             }
         }
+
+        Room targetRoom = roomRepository.findById(roomId)
+                .orElseThrow(() -> new EntityNotFoundException("Room with id %d does not exist!".formatted(roomId)));
 
         if (targetRoom.getRequester() != null) {
             return new MessageResponse(MessageResponseType.ERROR
