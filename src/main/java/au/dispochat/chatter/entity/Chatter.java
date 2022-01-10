@@ -20,7 +20,9 @@ public class Chatter {
     @JoinColumn(name = "ROOM")
     private Room room;
 
+    @Enumerated(EnumType.STRING)
     private ChatterType chatterType;
+
     private String nickName;
     private String city;
     private String country;
