@@ -2,6 +2,7 @@ package au.dispochat.common.basecontroller;
 
 import au.dispochat.common.dto.MessageResponse;
 import au.dispochat.common.enums.MessageResponseType;
+import org.springframework.dao.PermissionDeniedDataAccessException;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -19,4 +20,8 @@ public class BaseController {
         return new MessageResponse(MessageResponseType.ERROR, exception.getMessage(), null);
     }
 
+    @ExceptionHandler(PermissionDeniedDataAccessException.class)
+    public MessageResponse permissionDeniedDataAccessExceptionHandler(Exception exception) {
+        return new MessageResponse(MessageResponseType.ERROR, exception.getMessage(), null);
+    }
 }

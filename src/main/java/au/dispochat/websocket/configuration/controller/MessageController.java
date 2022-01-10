@@ -1,6 +1,7 @@
 package au.dispochat.websocket.configuration.controller;
 
 import au.dispochat.chatter.entity.Chatter;
+import au.dispochat.common.basecontroller.BaseController;
 import au.dispochat.websocket.configuration.model.MessageModel;
 import au.dispochat.websocket.configuration.service.MessageService;
 import lombok.RequiredArgsConstructor;
@@ -12,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-public class MessageController {
+public class MessageController extends BaseController {
 
     @Autowired
     private final SimpMessagingTemplate simpMessagingTemplate;
@@ -23,6 +24,8 @@ public class MessageController {
         Chatter receiver = messageService.sendMessage(message);
 
         //TODO convertAndSendToUser
-        simpMessagingTemplate.convertAndSend("/topic/messages" + receiver.getUniqueKey(), message);
+        if (receiver != null) {
+            simpMessagingTemplate.convertAndSend("/topic/messages/" + receiver.getUniqueKey(), message);
+        }
     }
 }
