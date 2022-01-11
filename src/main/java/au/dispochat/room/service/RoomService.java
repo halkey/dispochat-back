@@ -198,20 +198,25 @@ public class RoomService {
                 .orElseThrow(() -> new EntityNotFoundException("You did not register yet!"));
 
         if (requester.getRoom() == null)
-            return new MessageResponse(MessageResponseType.SUCCESS, "You did not send a join request to any chat room", null);
+            return new MessageResponse(MessageResponseType.SUCCESS, "You did not send a join request to any chat room nor created a new one.", null);
 
+        if (requester.getChatterType() == null) {
+            return new MessageResponse(MessageResponseType.ERROR
+                    , "Your request is rejected by the owner of the chat room with id %d".formatted(requester.getRoom().getId()), null);
+        }
 
         if (requester.getChatterType().equals(ChatterType.OWNER)) {
             return new MessageResponse(MessageResponseType.ERROR
                     , "You are already have a chat room with id %d ".formatted(requester.getRoom().getId()), null);
         }
 
+
         if (requester.getChatterType().equals(ChatterType.GUEST)) {
             Room targetRoom = roomRepository.findById(requester.getRoom().getId())
                     .orElseThrow(() -> new EntityNotFoundException("Room with id %d does not exist!".formatted(requester.getRoom().getId())));
 
             if (targetRoom.getGuest() == requester) {
-                if (targetRoom.getRequester().getUniqueKey().equals(requester.getUniqueKey())) {
+                if (targetRoom.getGuest().getUniqueKey().equals(requester.getUniqueKey())) {
                     return new MessageResponse(MessageResponseType.SUCCESS, "%s has accepted your join request. You are being directed to room with id %d".formatted(targetRoom.getOwner().getNickName(), targetRoom.getId()), null);
                 }
             }
