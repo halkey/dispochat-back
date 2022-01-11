@@ -119,10 +119,6 @@ public class RoomService {
         Room targetRoom = roomRepository.findById(ownerChatter.getRoom().getId())
                 .orElseThrow(() -> new EntityNotFoundException("Room with id %d does not exist!".formatted(ownerChatter.getRoom().getId())));
 
-        if (targetRoom.getGuest() == null) {
-            return new MessageResponse(MessageResponseType.ERROR
-                    , "Sorry but there is no one who wants to join to your room!", null);
-        }
 
         if (targetRoom.getRequester() == null) {
             return new MessageResponse(MessageResponseType.ERROR
@@ -133,7 +129,6 @@ public class RoomService {
             return new MessageResponse(MessageResponseType.ERROR
                     , "You can not take more than one guest to your room!", null);
         }
-
 
         Chatter requesterChatter = targetRoom.getRequester();
 

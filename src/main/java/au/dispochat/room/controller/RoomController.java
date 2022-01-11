@@ -6,10 +6,7 @@ import au.dispochat.common.dto.MessageResponseFetchRequester;
 import au.dispochat.room.controller.dto.JoinRoomDTO;
 import au.dispochat.room.service.RoomService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -29,9 +26,9 @@ public class RoomController extends BaseController {
         return roomService.joinRoom(joinRoomDTO.getRoomId(), joinRoomDTO.getUniqueKey());
     }
 
-    @RequestMapping("/guestRequest")
+    @RequestMapping("/guestRequest/{isAccepted}")
     @PostMapping
-    public MessageResponse acceptGuest(@RequestBody String uniqueKey, Boolean isAccepted) {
+    public MessageResponse acceptGuest(@PathVariable Boolean isAccepted, @RequestBody String uniqueKey) {
         uniqueKey = uniqueKey.split("=")[0];
         return roomService.acceptGuest(uniqueKey, isAccepted);
     }
