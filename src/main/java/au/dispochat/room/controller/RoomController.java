@@ -43,11 +43,11 @@ public class RoomController extends BaseController {
         return roomService.fetchRequester(uniqueKey);
     }
 
-    //@RequestMapping("/isAccepted")
-    //@PostMapping
-    //public MessageResponse isAccepted(@RequestBody String uniqueKey) {
-    //    uniqueKey = uniqueKey.split("=")[0];
-    //    return roomService.isAccepted(uniqueKey);
-    //}
+    @RequestMapping("/isAccepted")
+    @PostMapping
+    public MessageResponse isAccepted(@RequestBody String uniqueKey) {
+        uniqueKey = uniqueKey.split("=")[0];
+        return roomService.isAccepted(uniqueKey);
+    }
 }
 
