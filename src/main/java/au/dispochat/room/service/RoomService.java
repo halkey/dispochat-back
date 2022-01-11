@@ -129,26 +129,33 @@ public class RoomService {
                     , "Sorry but there is no one who wants to join to your room!", null);
         }
 
-        if (!isAccepted) {
-            String guestChatterNickname = targetRoom.getRequester().getNickName();
-            targetRoom.setRequester(null);
-            roomRepository.updateRoom(targetRoom);
-
-            //TODO notify guest -
-
-            return new MessageResponse(MessageResponseType.SUCCESS
-                    , "Your reject request of user %s has been fulfilled."
-                    .formatted(guestChatterNickname), null);
-        }
-
         if (targetRoom.getGuest() != null) {
             return new MessageResponse(MessageResponseType.ERROR
                     , "You can not take more than one guest to your room!", null);
         }
 
+
+        Chatter requesterChatter = targetRoom.getRequester();
+
+        if (!isAccepted) {
+            targetRoom.setRequester(null);
+            roomRepository.updateRoom(targetRoom);
+
+            requesterChatter.setChatterType(null);
+            chatterService.updateChatter(requesterChatter);
+
+            return new MessageResponse(MessageResponseType.SUCCESS
+                    , "Your reject request of user %s has been fulfilled."
+                    .formatted(requesterChatter.getNickName()), null);
+        }
+
+
         targetRoom.setGuest(targetRoom.getRequester());
         targetRoom.setRequester(null);
         roomRepository.updateRoom(targetRoom);
+
+        requesterChatter.setChatterType(ChatterType.GUEST);
+        chatterService.updateChatter(requesterChatter);
 
         //TODO notify guest +
 
@@ -191,45 +198,33 @@ public class RoomService {
         return new MessageResponseFetchRequester(MessageResponseType.SUCCESS, "%s wants to join to your room".formatted(requester.getNickName()), requester);
     }
 
-    //public MessageResponse isAccepted(String uniqueKey) {
-    //    Chatter requester = chatterService.findByUniqueKey(uniqueKey)
-    //            .orElseThrow(() -> new EntityNotFoundException("You did not register yet!"));
+    public MessageResponse isAccepted(String uniqueKey) {
+        Chatter requester = chatterService.findByUniqueKey(uniqueKey)
+                .orElseThrow(() -> new EntityNotFoundException("You did not register yet!"));
 
-    //    if (requester.getRoom() != null) {
-    //        if (requester.getChatterType().equals(ChatterType.OWNER)) {
-    //            return new MessageResponse(MessageResponseType.ERROR
-    //                    , "You are already have a chat room with id %d ".formatted(requester.getRoom().getId()), null);
-    //        } else if (requester.getChatterType().equals(ChatterType.GUEST)) {
-    //            return new MessageResponse(MessageResponseType.ERROR
-    //                    , "You are already in a chat room with id %d as a guest.".formatted(requester.getRoom().getId()), null);
-    //        }
-    //    }
-
-    //    Room targetRoom = roomRepository.findById(requester.getRoom().getId())
-    //            .orElseThrow(() -> new EntityNotFoundException("Room with id %d does not exist!".formatted(requester.getRoom().getId())));
-
-    //    if (targetRoom.getGuest() != null) {
-    //        return new MessageResponse(MessageResponseType.ERROR
-    //                , "You are too late! Someone else has joined to the room with id %d before you and the chat has started".formatted(targetRoom.getId()), null);
-    //    }
-    //    if (targetRoom.getRequester() != null) {
-    //        return new MessageResponse(MessageResponseType.ERROR
-    //                , "You are too late! Someone else sent a join request to the room with id %d before you.".formatted(targetRoom.getId()), null);
-    //    }
+        if (requester.getRoom() == null)
+            return new MessageResponse(MessageResponseType.SUCCESS, "You did not send a join request to any chat room", null);
 
 
+        if (requester.getChatterType().equals(ChatterType.OWNER)) {
+            return new MessageResponse(MessageResponseType.ERROR
+                    , "You are already have a chat room with id %d ".formatted(requester.getRoom().getId()), null);
+        }
 
+        if (requester.getChatterType().equals(ChatterType.GUEST)) {
+            Room targetRoom = roomRepository.findById(requester.getRoom().getId())
+                    .orElseThrow(() -> new EntityNotFoundException("Room with id %d does not exist!".formatted(requester.getRoom().getId())));
 
+            if (targetRoom.getGuest() == requester) {
+                if (targetRoom.getRequester().getUniqueKey().equals(requester.getUniqueKey())) {
+                    return new MessageResponse(MessageResponseType.SUCCESS, "%s has accepted your join request. You are being directed to room with id %d".formatted(targetRoom.getOwner().getNickName(), targetRoom.getId()), null);
+                }
+            }
+        } else if (requester.getChatterType().equals(ChatterType.REQUESTER)) {
+            return new MessageResponse(MessageResponseType.ERROR, "Sorry but owner has not gave an instruction yet", null);
+        }
 
+        return new MessageResponse(MessageResponseType.ERROR, "Opss something went wrong", null);
 
-
-
-
-
-
-
-
-   //    return new MessageResponse(MessageResponseType.SUCCESS, "%s has accepted your join request. You are being directed to room with id %d".formatted(owner.getNickname, requester.getNickname), null);
-
-   //}
+    }
 }
