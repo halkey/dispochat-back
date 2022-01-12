@@ -10,6 +10,7 @@ import au.dispochat.common.enums.MessageResponseType;
 import au.dispochat.room.entity.Room;
 import au.dispochat.room.repository.RoomRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
@@ -25,6 +26,8 @@ public class RoomService {
     private final RoomRepository roomRepository;
 
     private final ChatterRepository chatterRepository;
+
+    private final SimpMessagingTemplate simpMessagingTemplate;
 
     @Transactional
     public MessageResponse createRoom(String uniqueKey) {
@@ -240,11 +243,13 @@ public class RoomService {
 
         Chatter ownerChatter = new Chatter();
         Chatter guestChatter = new Chatter();
+        Chatter killed = new Chatter();
 
         if (killer.getChatterType().equals(ChatterType.OWNER)) {
             ownerChatter = killer;
             guestChatter = chatterService.findByUniqueKey(targetRoom.getGuest().getUniqueKey())
                     .orElseThrow(() -> new EntityNotFoundException("Guest has already gone"));
+            killed = guestChatter;
         } else {
             guestChatter = killer;
             ownerChatter = chatterService.findByUniqueKey(targetRoom.getOwner().getUniqueKey())
@@ -255,6 +260,7 @@ public class RoomService {
         chatterRepository.deleteByUniqueKey(ownerChatter.getUniqueKey());
         chatterRepository.deleteByUniqueKey(guestChatter.getUniqueKey());
 
+        simpMessagingTemplate.convertAndSend("/topic/messages/" + killed.getUniqueKey(), "!?/kill");
         return new MessageResponse(MessageResponseType.SUCCESS
                 , "ALL OF THE DATA IS DELETED", null);
 
