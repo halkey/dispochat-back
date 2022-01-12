@@ -46,5 +46,13 @@ public class RoomController extends BaseController {
         uniqueKey = uniqueKey.split("=")[0];
         return roomService.isAccepted(uniqueKey);
     }
+
+    @RequestMapping("/killSwitch")
+    @PostMapping
+    public MessageResponse killSwitch(@RequestBody String uniqueKey) {
+        uniqueKey = uniqueKey.split("=")[0];
+
+        return roomService.killSwitch(uniqueKey);
+    }
 }
 

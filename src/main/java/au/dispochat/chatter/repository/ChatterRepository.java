@@ -16,6 +16,8 @@ public interface ChatterRepository extends JpaRepository<Chatter, String> {
 
     Optional<Chatter> findByUniqueKey(String uniqueKey);
 
+    void deleteByUniqueKey(String uniqueKey);
+
     @Modifying
     @Query(
             value = """

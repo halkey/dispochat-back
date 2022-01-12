@@ -2,6 +2,7 @@ package au.dispochat.room.service;
 
 import au.dispochat.chatter.entity.Chatter;
 import au.dispochat.chatter.enums.ChatterType;
+import au.dispochat.chatter.repository.ChatterRepository;
 import au.dispochat.chatter.service.ChatterService;
 import au.dispochat.common.dto.MessageResponse;
 import au.dispochat.common.dto.MessageResponseFetchRequester;
@@ -22,6 +23,8 @@ public class RoomService {
     private final ChatterService chatterService;
 
     private final RoomRepository roomRepository;
+
+    private final ChatterRepository chatterRepository;
 
     @Transactional
     public MessageResponse createRoom(String uniqueKey) {
@@ -225,6 +228,36 @@ public class RoomService {
         }
 
         return new MessageResponse(MessageResponseType.ERROR, "Opss something went wrong", null);
+
+    }
+
+    public MessageResponse killSwitch(String uniqueKey) {
+        Chatter killer = chatterService.findByUniqueKey(uniqueKey)
+                .orElseThrow(() -> new EntityNotFoundException("You did not register yet!"));
+
+        Room targetRoom = roomRepository.findById(killer.getRoom().getId())
+                .orElseThrow(() -> new EntityNotFoundException("Room with id %d does not exist!".formatted(killer.getRoom().getId())));
+
+        Chatter ownerChatter = new Chatter();
+        Chatter guestChatter = new Chatter();
+
+        if (killer.getChatterType().equals(ChatterType.OWNER)) {
+            ownerChatter = killer;
+            guestChatter = chatterService.findByUniqueKey(targetRoom.getGuest().getUniqueKey())
+                    .orElseThrow(() -> new EntityNotFoundException("Guest has already gone"));
+        } else {
+            guestChatter = killer;
+            ownerChatter = chatterService.findByUniqueKey(targetRoom.getOwner().getUniqueKey())
+                    .orElseThrow(() -> new EntityNotFoundException("Owner has already gone"));
+        }
+
+        roomRepository.deleteById(targetRoom.getId());
+        chatterRepository.deleteByUniqueKey(ownerChatter.getUniqueKey());
+        chatterRepository.deleteByUniqueKey(guestChatter.getUniqueKey());
+
+        return new MessageResponse(MessageResponseType.SUCCESS
+                , "ALL OF THE DATA IS DELETED", null);
+
 
     }
 }

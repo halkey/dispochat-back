@@ -13,6 +13,10 @@ public interface RoomRepository extends JpaRepository<Room, String> {
 
     Optional<Room> findById(Long id);
 
+    void deleteById(long id);
+
+
+
     @Modifying
     @Query(
             value = """
