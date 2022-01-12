@@ -7,6 +7,8 @@ import au.dispochat.chatter.service.ChatterService;
 import au.dispochat.common.dto.MessageResponse;
 import au.dispochat.common.dto.MessageResponseFetchRequester;
 import au.dispochat.common.enums.MessageResponseType;
+import au.dispochat.room.controller.dto.ChattersRequestDTO;
+import au.dispochat.room.controller.dto.ChattersResponseDTO;
 import au.dispochat.room.entity.Room;
 import au.dispochat.room.repository.RoomRepository;
 import lombok.RequiredArgsConstructor;
@@ -265,5 +267,37 @@ public class RoomService {
                 , "ALL OF THE DATA IS DELETED", null);
 
 
+    }
+
+    public ChattersResponseDTO queryChatter(ChattersRequestDTO chattersRequestDTO) {
+        Room targetRoom = roomRepository.findById(chattersRequestDTO.getRoomId())
+                .orElseThrow(() -> new EntityNotFoundException("Room with id %d does not exist!".formatted(chattersRequestDTO.getRoomId())));
+
+        Chatter roomRequester = chatterService.findByUniqueKey(chattersRequestDTO.getUniqueKey())
+                .orElseThrow(() -> new EntityNotFoundException("You did not register yet!"));
+
+        Chatter ownerChatter = new Chatter();
+        Chatter guestChatter = new Chatter();
+
+        if(roomRequester.getChatterType().equals(ChatterType.OWNER)) {
+            ownerChatter = roomRequester;
+            guestChatter = targetRoom.getGuest();
+        } else {
+            guestChatter = roomRequester;
+            ownerChatter = targetRoom.getOwner();
+        }
+
+        guestChatter.setUniqueKey("Seni hiç alakadar etmez nınınınnn");
+        guestChatter.setRoom(null);
+
+        ownerChatter.setUniqueKey("Seni hiç alakadar etmez nınınınnn");
+        ownerChatter.setRoom(null);
+
+
+        if(targetRoom.getGuest().getUniqueKey().equals(chattersRequestDTO.getUniqueKey()) || targetRoom.getOwner().getUniqueKey().equals(chattersRequestDTO.getUniqueKey())) {
+            return new ChattersResponseDTO(ownerChatter, guestChatter);
+        }
+
+        throw new EntityNotFoundException("Either room does not exist or you do not have the right permission.");
     }
 }
