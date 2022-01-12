@@ -260,6 +260,7 @@ public class RoomService {
             guestChatter = killer;
             ownerChatter = chatterService.findByUniqueKey(targetRoom.getOwner().getUniqueKey())
                     .orElseThrow(() -> new EntityNotFoundException("Owner has already gone"));
+            killed = ownerChatter;
         }
 
         targetRoom.setOwner(null);
@@ -300,6 +301,11 @@ public class RoomService {
             ownerChatter = targetRoom.getOwner();
         }
 
+        if(guestChatter == null) {
+            ownerChatter.setUniqueKey("Seni hiç alakadar etmez nınınınnn");
+            ownerChatter.setRoom(null);
+            return new ChattersResponseDTO(ownerChatter, null);
+        }
         guestChatter.setUniqueKey("Seni hiç alakadar etmez nınınınnn");
         guestChatter.setRoom(null);
 
@@ -311,6 +317,6 @@ public class RoomService {
             return new ChattersResponseDTO(ownerChatter, guestChatter);
         }
 
-        throw new EntityNotFoundException("Either room does not exist or you do not have the right permission.");
+        throw new EntityNotFoundException("Either room does not exist or you do not have the permission.");
     }
 }
