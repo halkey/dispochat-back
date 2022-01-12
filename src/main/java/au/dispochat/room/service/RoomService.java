@@ -236,6 +236,7 @@ public class RoomService {
 
     }
 
+    @Transactional
     public MessageResponse killSwitch(String uniqueKey) {
         Chatter killer = chatterService.findByUniqueKey(uniqueKey)
                 .orElseThrow(() -> new EntityNotFoundException("You did not register yet!"));
@@ -249,6 +250,9 @@ public class RoomService {
 
         if (killer.getChatterType().equals(ChatterType.OWNER)) {
             ownerChatter = killer;
+            if(targetRoom.getGuest() == null) {
+                throw new EntityNotFoundException("The room is empty");
+            }
             guestChatter = chatterService.findByUniqueKey(targetRoom.getGuest().getUniqueKey())
                     .orElseThrow(() -> new EntityNotFoundException("Guest has already gone"));
             killed = guestChatter;
@@ -257,6 +261,15 @@ public class RoomService {
             ownerChatter = chatterService.findByUniqueKey(targetRoom.getOwner().getUniqueKey())
                     .orElseThrow(() -> new EntityNotFoundException("Owner has already gone"));
         }
+
+        targetRoom.setOwner(null);
+        targetRoom.setGuest(null);
+        roomRepository.updateRoom(targetRoom);
+
+        ownerChatter.setRoom(null);
+        guestChatter.setRoom(null);
+        chatterService.updateChatter(ownerChatter);
+        chatterService.updateChatter(guestChatter);
 
         roomRepository.deleteById(targetRoom.getId());
         chatterRepository.deleteByUniqueKey(ownerChatter.getUniqueKey());
