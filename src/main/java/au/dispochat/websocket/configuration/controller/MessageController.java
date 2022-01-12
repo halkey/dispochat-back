@@ -25,7 +25,7 @@ public class MessageController extends BaseController {
 
         //TODO convertAndSendToUser
         if (receiver != null) {
-            simpMessagingTemplate.convertAndSend("/topic/messages/" + receiver.getUniqueKey(), message);
+            simpMessagingTemplate.convertAndSend("/topic/messages/" + receiver.getUniqueKey(), message.getMessage());
         }
     }
 }
