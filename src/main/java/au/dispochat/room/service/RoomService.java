@@ -206,7 +206,7 @@ public class RoomService {
                 .orElseThrow(() -> new EntityNotFoundException("You did not register yet!"));
 
         if (requester.getRoom() == null)
-            return new MessageResponse(MessageResponseType.SUCCESS, "You did not send a join request to any chat room nor created a new one.", null);
+            return new MessageResponse(MessageResponseType.ERROR, "You did not send a join request to any chat room nor created a new one.", null);
 
         if (requester.getChatterType() == null) {
             return new MessageResponse(MessageResponseType.ERROR

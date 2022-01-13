@@ -18,7 +18,7 @@ public class ChatterService {
     public MessageResponse createChatter(Chatter chatter) {
 
         if (chatterRepository.existsByUniqueKey(chatter.getUniqueKey())) {
-            return new MessageResponse(MessageResponseType.ERROR, "You are already registered!", null);
+            return new MessageResponse(MessageResponseType.SUCCESS, "You are already registered!", null);
         }
 
         chatterRepository.save(chatter);
