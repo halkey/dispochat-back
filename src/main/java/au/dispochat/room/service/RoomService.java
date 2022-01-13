@@ -244,14 +244,25 @@ public class RoomService {
         Room targetRoom = roomRepository.findById(killer.getRoom().getId())
                 .orElseThrow(() -> new EntityNotFoundException("Room with id %d does not exist!".formatted(killer.getRoom().getId())));
 
-        Chatter ownerChatter = new Chatter();
-        Chatter guestChatter = new Chatter();
-        Chatter killed = new Chatter();
+        Chatter ownerChatter;
+        Chatter guestChatter;
+        Chatter killed;
 
         if (killer.getChatterType().equals(ChatterType.OWNER)) {
             ownerChatter = killer;
-            if(targetRoom.getGuest() == null) {
-                throw new EntityNotFoundException("The room is empty");
+            if (targetRoom.getGuest() == null) {
+                targetRoom.setOwner(null);
+                targetRoom.setGuest(null);
+                roomRepository.updateRoom(targetRoom);
+
+                ownerChatter.setRoom(null);
+                chatterService.updateChatter(ownerChatter);
+
+                roomRepository.deleteById(targetRoom.getId());
+                chatterRepository.deleteByUniqueKey(ownerChatter.getUniqueKey());
+
+                return new MessageResponse(MessageResponseType.SUCCESS
+                        , "ALL OF THE DATA IS DELETED", null);
             }
             guestChatter = chatterService.findByUniqueKey(targetRoom.getGuest().getUniqueKey())
                     .orElseThrow(() -> new EntityNotFoundException("Guest has already gone"));
@@ -290,10 +301,10 @@ public class RoomService {
         Chatter roomRequester = chatterService.findByUniqueKey(chattersRequestDTO.getUniqueKey())
                 .orElseThrow(() -> new EntityNotFoundException("You did not register yet!"));
 
-        Chatter ownerChatter = new Chatter();
-        Chatter guestChatter = new Chatter();
+        Chatter ownerChatter;
+        Chatter guestChatter;
 
-        if(roomRequester.getChatterType().equals(ChatterType.OWNER)) {
+        if (roomRequester.getChatterType().equals(ChatterType.OWNER)) {
             ownerChatter = roomRequester;
             guestChatter = targetRoom.getGuest();
         } else {
@@ -301,7 +312,7 @@ public class RoomService {
             ownerChatter = targetRoom.getOwner();
         }
 
-        if(guestChatter == null) {
+        if (guestChatter == null) {
             ownerChatter.setUniqueKey("Seni hiç alakadar etmez nınınınnn");
             ownerChatter.setRoom(null);
             return new ChattersResponseDTO(ownerChatter, null);
