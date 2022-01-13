@@ -317,14 +317,13 @@ public class RoomService {
             ownerChatter.setRoom(null);
             return new ChattersResponseDTO(ownerChatter, null);
         }
-        guestChatter.setUniqueKey("Seni hiç alakadar etmez nınınınnn");
-        guestChatter.setRoom(null);
-
-        ownerChatter.setUniqueKey("Seni hiç alakadar etmez nınınınnn");
-        ownerChatter.setRoom(null);
-
 
         if(targetRoom.getGuest().getUniqueKey().equals(chattersRequestDTO.getUniqueKey()) || targetRoom.getOwner().getUniqueKey().equals(chattersRequestDTO.getUniqueKey())) {
+            guestChatter.setUniqueKey("Seni hiç alakadar etmez nınınınnn");
+            guestChatter.setRoom(null);
+
+            ownerChatter.setUniqueKey("Seni hiç alakadar etmez nınınınnn");
+            ownerChatter.setRoom(null);
             return new ChattersResponseDTO(ownerChatter, guestChatter);
         }
 
