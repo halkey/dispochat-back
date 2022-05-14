@@ -25,12 +25,6 @@ public class File {
     @Lob
     private byte[] fileData;
 
-    public File(String fileName, String fileType) {
-        this.fileName = fileName;
-        this.fileType = fileType;
-
-    }
-
     public File(String fileName, String fileType, byte[] fileData) {
         this.fileName = fileName;
         this.fileType = fileType;

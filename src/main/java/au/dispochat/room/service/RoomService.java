@@ -7,6 +7,7 @@ import au.dispochat.chatter.service.ChatterService;
 import au.dispochat.common.dto.MessageResponse;
 import au.dispochat.common.dto.MessageResponseFetchRequester;
 import au.dispochat.common.enums.MessageResponseType;
+import au.dispochat.common.exception.*;
 import au.dispochat.room.controller.dto.ChattersRequestDTO;
 import au.dispochat.room.controller.dto.ChattersResponseDTO;
 import au.dispochat.room.entity.Room;
@@ -32,21 +33,18 @@ public class RoomService {
     private final SimpMessagingTemplate simpMessagingTemplate;
 
     @Transactional
-    public MessageResponse createRoom(String uniqueKey) {
+    public MessageResponse createRoom(String uniqueKey) throws Exception {
 
         Chatter chatter = chatterService.findByUniqueKey(uniqueKey)
-                .orElseThrow(() -> new EntityNotFoundException("You Did Not Register Yet!"));
+                .orElseThrow(NotRegisteredYetException::new);
 
         if (chatter.getRoom() != null) {
             if (chatter.getChatterType().equals(ChatterType.OWNER)) {
-                return new MessageResponse(MessageResponseType.ERROR
-                        , "You are already have a chat room with id %d ".formatted(chatter.getRoom().getId()), null);
+                throw new AlreadyOwnerException(chatter.getRoom().getId());
             } else if (chatter.getChatterType().equals(ChatterType.GUEST)) {
-                return new MessageResponse(MessageResponseType.ERROR
-                        , "You are already in a chat room with id %d as a guest.".formatted(chatter.getRoom().getId()), null);
+                throw new AlreadyGuestException(chatter.getRoom().getId());
             } else if (chatter.getChatterType().equals(ChatterType.REQUESTER)) {
-                return new MessageResponse(MessageResponseType.ERROR
-                        , "You have already requested to join a chat room with id %d as a guest. Wait for the result or you can cancel it".formatted(chatter.getRoom().getId()), null);
+                throw new AlreadyRequestedToJoinException(chatter.getRoom().getId());
             }
         }
 
@@ -66,25 +64,22 @@ public class RoomService {
     }
 
     @Transactional
-    public MessageResponse joinRoom(Long roomId, String uniqueKey) {
+    public MessageResponse joinRoom(Long roomId, String uniqueKey) throws Exception {
         Chatter requester = chatterService.findByUniqueKey(uniqueKey)
-                .orElseThrow(() -> new EntityNotFoundException("You did not register yet!"));
+                .orElseThrow(NotRegisteredYetException::new);
 
         if (requester.getRoom() != null) {
             if (requester.getChatterType().equals(ChatterType.OWNER)) {
-                return new MessageResponse(MessageResponseType.ERROR
-                        , "You are already have a chat room with id %d".formatted(requester.getRoom().getId()), null);
+                throw new AlreadyOwnerException(requester.getRoom().getId());
             } else if (requester.getChatterType().equals(ChatterType.GUEST)) {
-                return new MessageResponse(MessageResponseType.ERROR
-                        , "You are already in a chat room with id %d as a guest.".formatted(requester.getRoom().getId()), null);
+                throw new AlreadyGuestException(requester.getRoom().getId());
             } else if (requester.getChatterType().equals(ChatterType.REQUESTER)) {
-                return new MessageResponse(MessageResponseType.ERROR
-                        , "You have already requested to join a chat room with id %d as a guest.".formatted(requester.getRoom().getId()), null);
+                throw new AlreadyRequestedToJoinException(requester.getRoom().getId());
             }
         }
 
         Room targetRoom = roomRepository.findById(roomId)
-                .orElseThrow(() -> new EntityNotFoundException("Room with id %d does not exist!".formatted(roomId)));
+                .orElseThrow(() -> new RoomNotExistException(roomId));
 
         if (targetRoom.getRequester() != null) {
             return new MessageResponse(MessageResponseType.ERROR
@@ -110,9 +105,9 @@ public class RoomService {
     }
 
     @Transactional
-    public MessageResponse acceptGuest(String uniqueKey, Boolean isAccepted) {
+    public MessageResponse acceptGuest(String uniqueKey, Boolean isAccepted) throws Exception {
         Chatter ownerChatter = chatterService.findByUniqueKey(uniqueKey)
-                .orElseThrow(() -> new EntityNotFoundException("You did not register yet!"));
+                .orElseThrow(NotRegisteredYetException::new);
 
         if (ownerChatter.getRoom() == null) {
             return new MessageResponse(MessageResponseType.ERROR
@@ -125,7 +120,7 @@ public class RoomService {
         }
 
         Room targetRoom = roomRepository.findById(ownerChatter.getRoom().getId())
-                .orElseThrow(() -> new EntityNotFoundException("Room with id %d does not exist!".formatted(ownerChatter.getRoom().getId())));
+                .orElseThrow(() -> new RoomNotExistException(ownerChatter.getRoom().getId()));
 
 
         if (targetRoom.getRequester() == null) {
@@ -167,9 +162,9 @@ public class RoomService {
                 .formatted(targetRoom.getGuest().getNickName()), null);
     }
 
-    public MessageResponseFetchRequester fetchRequester(String uniqueKey) {
+    public MessageResponseFetchRequester fetchRequester(String uniqueKey) throws Exception {
         Chatter ownerChatter = chatterService.findByUniqueKey(uniqueKey)
-                .orElseThrow(() -> new EntityNotFoundException("You did not register yet!"));
+                .orElseThrow(NotRegisteredYetException::new);
 
         if (ownerChatter.getRoom() == null) {
             return new MessageResponseFetchRequester(MessageResponseType.ERROR

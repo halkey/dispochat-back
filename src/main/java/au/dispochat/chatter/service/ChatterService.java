@@ -4,7 +4,9 @@ import au.dispochat.chatter.entity.Chatter;
 import au.dispochat.chatter.repository.ChatterRepository;
 import au.dispochat.common.dto.MessageResponse;
 import au.dispochat.common.enums.MessageResponseType;
+import au.dispochat.common.exception.AlreadyRegisteredException;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -15,10 +17,11 @@ public class ChatterService {
 
     private final ChatterRepository chatterRepository;
 
+    @SneakyThrows
     public MessageResponse createChatter(Chatter chatter) {
 
         if (chatterRepository.existsByUniqueKey(chatter.getUniqueKey())) {
-            return new MessageResponse(MessageResponseType.SUCCESS, "You are already registered!", null);
+            throw new AlreadyRegisteredException();
         }
 
         chatterRepository.save(chatter);

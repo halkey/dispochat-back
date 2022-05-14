@@ -18,26 +18,26 @@ public class RoomController extends BaseController {
 
     @RequestMapping("/createRoom")
     @PostMapping
-    public MessageResponse createRoom(@RequestBody String uniqueKey) {
+    public MessageResponse createRoom(@RequestBody String uniqueKey) throws Exception {
         return roomService.createRoom(uniqueKey.split("=")[0]);
     }
 
     @RequestMapping("/joinRoom")
     @PostMapping
-    public MessageResponse joinRoom(@RequestBody final JoinRoomDTO joinRoomDTO) {
+    public MessageResponse joinRoom(@RequestBody final JoinRoomDTO joinRoomDTO) throws Exception {
         return roomService.joinRoom(joinRoomDTO.getRoomId(), joinRoomDTO.getUniqueKey());
     }
 
     @RequestMapping("/guestRequest/{isAccepted}")
     @PostMapping
-    public MessageResponse acceptGuest(@PathVariable Boolean isAccepted, @RequestBody String uniqueKey) {
+    public MessageResponse acceptGuest(@PathVariable Boolean isAccepted, @RequestBody String uniqueKey) throws Exception {
         uniqueKey = uniqueKey.split("=")[0];
         return roomService.acceptGuest(uniqueKey, isAccepted);
     }
 
     @RequestMapping("/fetchRequester")
     @PostMapping
-    public MessageResponseFetchRequester fetchRequester(@RequestBody String uniqueKey) {
+    public MessageResponseFetchRequester fetchRequester(@RequestBody String uniqueKey) throws Exception {
         uniqueKey = uniqueKey.split("=")[0];
         return roomService.fetchRequester(uniqueKey);
     }
